@@ -16,22 +16,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// 4. BANCO DE DADOS E SESSÃO (CONFIGURAÇÃO PARA RENDER)
-const db = new Pool({
-  // Esta variável de ambiente é fornecida AUTOMATICAMENTE pelo Render
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Essencial para a conexão no Render
-  }
-});
-const sessionStore = new pgSession({
-    pool: db,
-    tableName: 'session'
-});
+// =================================================================
+// 4. BANCO DE DADOS E SESSÃO
+// =================================================================
+const db = new Pool({ /* ... sua configuração do pool ... */ });
+const sessionStore = new pgSession({ /* ... sua configuração da loja ... */ });
 
+
+// VAMOS ADICIONAR O TESTE AQUI
+console.log("--- INICIANDO VERIFICAÇÃO DE VARIÁVEIS DE AMBIENTE ---");
+console.log("Valor de SESSION_SECRET:", process.env.SESSION_SECRET);
+console.log("--- FIM DA VERIFICAÇÃO ---");
+
+
+// Bloco da sessão original
 app.use(session({
     store: sessionStore,
-    // ESSA VARIÁVEL VOCÊ PRECISA CRIAR MANUALMENTE NO PAINEL DO RENDER
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
@@ -42,7 +42,6 @@ app.use(session({
         maxAge: 30 * 24 * 60 * 60 * 1000
     }
 }));
-
 // 5. MIDDLEWARES DE AUTENTICAÇÃO (sem alterações)
 const isLoggedIn = (req, res, next) => {
     if (!req.session.userId) { return res.redirect('/login.html'); }
