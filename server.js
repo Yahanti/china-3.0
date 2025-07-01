@@ -108,6 +108,18 @@ app.get('/api/avisos', isLoggedIn, async (req, res) => {
 
 // --- APIs de Administração ---
 
+app.get('/api/health', async (req, res) => {
+    try {
+        // Faz uma consulta super simples e rápida só para "acordar" o banco.
+        await db.query('SELECT 1');
+        console.log("Health check bem-sucedido. Banco de dados está acordado.");
+        res.json({ status: 'ok', message: 'Conexão com o banco de dados está ativa.' });
+    } catch (error) {
+        console.error("Health check falhou:", error);
+        res.status(503).json({ status: 'error', message: 'Não foi possível conectar ao banco de dados.' });
+    }
+});
+
 // ROTA PARA RECRUTAS PENDENTES - ESTA TAMBÉM ESTAVA FALTANDO
 app.get('/api/admin/recrutas-pendentes', isLoggedIn, isAdmin, async (req, res) => {
     try {
